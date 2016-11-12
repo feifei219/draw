@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>绘图板</title>
+    <style type="text/css">
+    body{
+        background:#000;
+    }
+     *{
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+    .container{
+        width:1050px;
+        height:600px;
+        margin:0 auto;
+    }
+    canvas{
+        display: block;
+        background:#fff;
+        position: absolute;
+        left:0;right:0;top:0;bottom:0;
+        margin:auto;
+        cursor:crosshair;
+    }
+    .controllbar{
+        width:250px;height:600px;
+        background:rgb(20, 154, 235);
+        line-height:50px;
+        font-size:18px;
+        font-weight: bold;
+        color:#fff;
+        position: absolute;
+        left:30px;
+        top:36px;
+        /*float: left;*/
+    }
+    .controllbar2{
+        width:250px;height:600px;
+        background:rgb(20, 154, 235);
+        line-height:50px;
+        font-size:18px;
+        font-weight: bold;
+        color:#fff;
+        position: absolute;
+        right:30px;
+        top:36px;
+        /*float: left;*/
+    }
+    .box{
+        width:200px;
+        height:50px;
+        margin:0 auto;
+    }
+    #eraser{
+        cursor:url(eraser.jpg),default;
+    }
+
+    </style>
+</head>
+<body>
+ <!-- <div class="container">   -->
+    <div class="controllbar">
+        <div class="box type">
+            形状:<select name="" id="typechoose" style="width:75px;">
+                <option value="rect">矩形</option>
+                <option value="circle">圆形</option>
+                <option value="line">线</option>
+            </select>
+        </div>
+        <div class="box bgcolor">
+            背景:<input type="color" id="bgcolor" value="#ffffff" style="width:70px;"/>
+        </div> 
+        <div class="box color">
+            颜色:<input type="color" id="color" style="width:70px;"/>
+        </div>   
+        <div class="box type2">
+            类型:<select name="" id="typechoose2" style="width:75px;">
+                <option value="stroke">描边</option>
+                <option value="fill">填充</option>
+            </select>
+        </div>
+        <div class="box width">
+            宽度:<input type="number" id="number" min="1" value="1" style="width:72px;"/>
+        </div> 
+        <div class="box dbx">
+        <label>
+            多边形:
+            <input type="checkbox" id="poly" />
+            <input type="number" id="linenum" min="3" max="10" value="3" style="width:72px;"/></label>
+        </div>
+        <!-- <div class="box dbx">
+        <label>
+            多角星:
+            <input type="checkbox" id="jiao" />
+            <input type="number" id="xnum" min="3" max="10" value="3" style="width:72px;"/></label>
+        </div> -->
+        <div class="box pen">
+            铅笔<input type="checkbox" id="pen"/>
+        </div> 
+        <div class="box">
+            橡皮<input type="checkbox" id="eraser"/>
+        </div> 
+        <div class="box">
+            剪切<input type="checkbox" id="cut"/>
+        </div> 
+        <div class="box">
+            复制<input type="checkbox" id="copy"/>
+        </div>
+    </div>
+    <div class="controllbar2">
+        <div class="box">
+            <button style="width: 80px;background-color: white;" id="save">保存</button>
+        </div>
+        <div class="box">
+            <button style="width: 80px;background-color: white;" id="back">撤销</button>
+        </div> 
+        <div class="box">
+            <button style="width: 80px;background-color: white;" id="newc">新建</button>
+        </div> 
+        <div class="box">
+            <button style="width: 80px;background-color: white;" id="clear">清空</button>
+        </div> 
+        <!-- <div class="box">
+            <button style="width: 80px;background-color: white;" onclick="copyimage();">EXPORT</button>
+        </div> -->
+    </div>
+        <canvas width="800" height="600"></canvas>
+        <div class="alertbox" style="display:none">
+            画布宽度：<input type="text" />
+            画布高度：<input type="text" />
+            <button style="width: 80px;background-color: white;" id="sure">确定</button>
+            <button style="width: 80px;background-color: white;" id="cancel">取消</button>
+        </div>
+<!-- </div>    -->
+    <!-- <br/>
+    <img src="" id="image_png" width="400px" height="400px" style="display:block;margin:0 auto">
+    <br/> -->
+</body>
+<script type="text/javascript" src="draw.js"></script>
+<script type="text/javascript">
+
+     var canvas=document.querySelector("canvas");
+     var controllbar=document.querySelector(".controllbar");
+     var container=document.querySelector(".container");
+     var typechoose=document.querySelector("#typechoose");
+     var typechoose2=document.querySelector("#typechoose2");
+     var mycolor=document.querySelector("#color");
+     var bgcolor=document.querySelector("#bgcolor");
+     var poly=document.querySelector("#poly");
+     var jiao=document.querySelector("#jiao");
+     var number=document.querySelector("#number");
+     var linenum=document.querySelector("#linenum");
+     var jiaonum=document.querySelector("#jiaonum");
+     var pen=document.querySelector("#pen");
+     var eraser=document.querySelector("#eraser");
+     var cut=document.querySelector("#cut");
+     var save=document.querySelector("#save");
+     var back=document.querySelector("#back");
+     var copy=document.querySelector("#copy");
+     var clear=document.querySelector("#clear");
+     var newc=document.querySelector("#newc");
+     var cobj=canvas.getContext("2d");
+     var type="rect";
+     var mytype;
+     var mycolor;
+     var mywidth;
+     var linenum;
+     typechoose.onblur=function(){
+        cancelcheck();
+        type=this.value;
+     }
+     typechoose2.onchange=function(){
+        mytype=this.value;
+     }
+     bgcolor.onchange=function(){
+        canvas.style.background=this.value;
+     }
+     mycolor.onchange=function(){
+        mycolor=this.value;
+     }
+     number.onchange=function(){
+        mywidth=this.value;
+     }
+     // 多边形
+     poly.onchange=function(){
+        if(this.checked){
+            cancelcheck();
+            this.checked=true;
+            type="poly";
+        }else{
+            type=typechoose.value;
+        }
+     }
+     // 边数
+     var num=3;
+     linenum.onchange=function(){
+        num=this.value;
+     }
+      // 多边形
+     jiao.onchange=function(){
+        if(this.checked){
+            cancelcheck();
+            this.checked=true;
+            type="jiao";
+        }else{
+            type=typechoose.value;
+        }
+     }
+     // 星数
+     var jiaonum=3;
+     jiaonum.onchange=function(){
+        jiaonum=this.value;
+     }
+     // 铅笔
+     pen.onchange=function(){
+        if(this.checked){
+            canvas.style.cursor="default";
+            cancelcheck();
+            this.checked=true;
+            type="pen";
+        }else{
+            type=typechoose.value;
+            canvas.style.cursor="crosshair";
+        }
+     }
+     // 橡皮
+     eraser.onchange=function(){
+        if(this.checked){
+            canvas.style.cursor="url(eraser.jpg),default";
+            cancelcheck();
+            this.checked=true;
+            type="eraser";
+            
+        }else{
+            type=typechoose.value;
+            canvas.style.cursor="crosshair";
+
+        }
+     }
+     // 剪切
+     
+     cut.onchange=function(){
+        if(this.checked){
+            cancelcheck();
+            this.checked=true;
+            type="cut";
+        }else{
+            type=typechoose.value;
+        }
+     }
+     // 复制
+     var iscopy=false;
+     copy.onchange=function(){
+        if(this.checked){
+            cancelcheck();
+            this.checked=true;
+            type="cut";
+            iscopy=true;
+        }else{
+            type=typechoose.value;
+            iscopy=false;
+        }
+     }
+     // 撤销
+     
+     back.onclick=function(){
+        arr.pop();
+        
+        console.log(arr.pop());
+        cobj.clearRect(0,0,newwidth,newheight);
+        cobj.putImageData(arr[arr.length-1],0,0,0,0,newwidth,newheight);
+     }
+
+     // 保存
+     save.onclick=function(){
+        var res=canvas.toDataURL("images/png");
+        location.href=res;
+     }
+    // 新建
+     var newwidth=""||800;
+     var newheight=""||600;
+     newc.onclick=function(){
+        cobj.clearRect(0,0,newwidth,newheight);
+        arr.splice(0,arr.length);
+        newwidth=prompt("请输入所需画布的宽度","800");
+        newheight=prompt("请输入所需画布的高度","600");
+        // var canvas = document.createElement('canvas');
+        // container.appendChild(canvas);
+        if(newwidth==""){
+            canvas.width = 800;
+        }else{
+            canvas.width = newwidth;
+        }
+        if (newheight=="") {
+            canvas.height = 600;
+        }else{
+            canvas.height = newheight;
+        }
+        canvas.style.backgroundColor = '#ffffff';
+     }
+    // 清空
+     clear.onclick=function(){
+        cobj.clearRect(0,0,newwidth,newheight);
+        arr.splice(0,arr.length);
+     }
+
+    
+     // 取消选中效果
+     var checkboxes=document.querySelectorAll("[type=checkbox]");
+     function cancelcheck(){
+        for (var i = 0; i < checkboxes.length; i++) {
+            checkboxes[i].checked=false;
+            iscopy=false;
+        };
+     }
+     // 鼠标操作
+     var ox,oy,ow,oh;
+     var arr=[];
+     var lox,loy,low,loh;  //保存剪切区域的位置和大小
+     // var step=0;          //用来判断当前操作进行到第几步
+     var cutflag=false;
+     var cutdata;      //存储数据
+     canvas.onmousedown=function(e){
+        ox=e.offsetX;
+        oy=e.offsetY;
+        var draw=new Draw(cobj,{type:mytype,color:mycolor,width:mywidth});
+        if(type=="pen"){
+            cobj.beginPath();
+            cobj.moveTo(ox, oy);
+        }
+        canvas.onmousemove=function(e){
+            ow=e.offsetX;
+            oh=e.offsetY;
+            if(type=="jiao"){
+                draw[type](ox,oy,ow,oh,jiaonum);
+            }
+            if(type!="eraser"){
+                cobj.clearRect(0,0,newwidth,newheight);
+                if(arr.length!=0){
+                    cobj.putImageData(arr[arr.length-1],0,0,0,0,newwidth,newheight)
+                }
+            }
+            if(cutflag&&type=="cut"){
+                cobj.clearRect(lox-1,loy-1,low-lox+2,loh-loy+2);
+                if(!iscopy){
+                    cobj.clearRect(lox-1,loy-1,low-lox+2,loh-loy+2);
+                }
+                if(iscopy){
+                    cobj.putImageData(arr[arr.length-2],0,0,0,0,newwidth,newheight)
+                }
+                var nx=lox+ow-ox;
+                var ny=loy+oh-oy;
+                cobj.putImageData(cutdata,nx,ny);
+                // cobj.putImageData(cutdata,ow,oh);
+                canvas.style.cursor="default";
+            }else if(type=="poly"){
+                draw[type](ox,oy,ow,oh,num);
+            }else{
+                draw[type](ox,oy,ow,oh);
+                canvas.style.cursor="default";
+            }
+
+        }
+        document.onmouseup=function(){
+            canvas.onmousemove=null;
+            canvas.onmouseup=null;
+            if(type=="cut"){
+                if(cutflag==false){
+                    cutflag=true;
+                    cutdata=cobj.getImageData(ox+1,oy+1,ow-ox-2,oh-oy-2);
+                    lox=ox;
+                    loy=oy;
+                    low=ow;
+                    loh=oh;
+                    // controllbar.style.display="none";
+                    // cobj.clearRect(lox-1,loy-1,low-lox+2,loh-loy+2);
+                    // cobj.putImageData(cutdata,ox+1,oy+1)
+                }else{
+                    cutflag=false;
+                   
+                    // controllbar.style.display="block";
+                }
+            }
+            // else{
+            //      arr.push(cobj.getImageData(0,0,newwidth,newheight));
+            // }
+            arr.push(cobj.getImageData(0,0,newwidth,newheight));
+        }
+     }
+    
+    
+     // 保存
+    //  function copyimage(){
+    //     var img_png_src = canvas.toDataURL("image/png");  //将画板保存为图片格式的函数
+    //     document.getElementById("image_png").src = img_png_src;
+    // }
+</script>
+</html>
