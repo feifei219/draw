@@ -151,7 +151,7 @@
      var mycolor=document.querySelector("#color");
      var bgcolor=document.querySelector("#bgcolor");
      var poly=document.querySelector("#poly");
-     var jiao=document.querySelector("#jiao");
+     // var jiao=document.querySelector("#jiao");
      var number=document.querySelector("#number");
      var linenum=document.querySelector("#linenum");
      var jiaonum=document.querySelector("#jiaonum");
@@ -201,15 +201,15 @@
         num=this.value;
      }
       // 多边形
-     jiao.onchange=function(){
-        if(this.checked){
-            cancelcheck();
-            this.checked=true;
-            type="jiao";
-        }else{
-            type=typechoose.value;
-        }
-     }
+     // jiao.onchange=function(){
+     //    if(this.checked){
+     //        cancelcheck();
+     //        this.checked=true;
+     //        type="jiao";
+     //    }else{
+     //        type=typechoose.value;
+     //    }
+     // }
      // 星数
      var jiaonum=3;
      jiaonum.onchange=function(){
@@ -335,9 +335,7 @@
         canvas.onmousemove=function(e){
             ow=e.offsetX;
             oh=e.offsetY;
-            if(type=="jiao"){
-                draw[type](ox,oy,ow,oh,jiaonum);
-            }
+            
             if(type!="eraser"){
                 cobj.clearRect(0,0,newwidth,newheight);
                 if(arr.length!=0){
